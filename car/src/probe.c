@@ -200,6 +200,12 @@ int probe_deep(void)
     P("-- HKLM\\System (概览) --");
     dump_tree(L"System", 0, "HKLM\\System");
 
+    P("-- HKLM\\SOFTWARE (概览，找 MAP 键启动配置) --");
+    dump_tree(L"SOFTWARE", 0, "HKLM\\SOFTWARE");
+
+    P("-- HKLM\\SOFTWARE\\Shell (启动/导航路径配置) --");
+    dump_tree(L"SOFTWARE\\Shell", 1, "SOFTWARE\\Shell");
+
     if (g_budget <= 0)
         P("(达到行数上限，探测被截断)");
     P("======== 深度探测结束，共 %d 行 ========", g_lines);

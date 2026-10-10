@@ -4,10 +4,10 @@
 
 ## 1. 项目状态一览
 
-- 仓库：`main` 分支，已有 tag `v0.1.0`（车机端侦察版，已构建验证）
-- 已完成：手机端 APK 逆向（协议见 `dex_out.txt`）、WinCE 交叉编译工具链打通、车机端 v0.1.0（壳+探测+触摸测试+日志）
+- 仓库：`main` 分支，已有 tag `v0.1.0`（车机端侦察版）、`v0.2.0`（MAP 键启动安装）
+- 已完成：手机端 APK 逆向（协议见 `dex_out.txt`）、WinCE 交叉编译工具链打通、车机端 v0.1.0（壳+探测+触摸测试+日志）、v0.2.0（`[安装MAP启动]` 自复制到凯立德标准导航路径 `NaviOne\NaviOne.exe` 等 6 个候选 + `HKLM\SOFTWARE` 启动配置探测——适配"MAP 键硬路径启动、缺文件弹文件管理器"的凯立德时代启动方式）
 - 下一步（按序）：
-  1. 收集用户车机运行 `EasyLink-v0.1.0.exe` 后产生的 `\SDMMC\easylink_probe.log`，分析 USB 驱动栈 → **决定连接通道方案**（ADB-over-USB vs RNDIS 网络 vs 平台 USB 驱动直连）
+  1. 收集用户车机运行 `EasyLink-v0.2.0.exe` 的日志（重点：点 `[安装MAP启动]` 后 MAP 键是否直接启动；若失败则 `深度探测` 日志中 `HKLM\SOFTWARE\Shell` 会暴露 MAP 键真实启动路径）→ **决定连接通道方案**（ADB-over-USB vs RNDIS 网络 vs 平台 USB 驱动直连）
   2. 手机端：安装 JDK + Android SDK（工具装 `D:\LGprogram\wince` 下），新写 Android 投屏 App（MediaProjection + MediaCodec，监听 `0.0.0.0` 而非回环）
   3. 协议 EC47 实现（车机端收流、手机端推流）
   4. 触摸回传（车机 WM_LBUTTONDOWN → 协议 → 手机 Accessibility 注入）

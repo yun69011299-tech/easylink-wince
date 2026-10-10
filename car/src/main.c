@@ -1,14 +1,16 @@
 /*
- * EasyLink 车机端 v0.1.0（侦察版）
- * 目标：WinCE 车机全屏壳 + 系统/驱动探测 + 触摸测试 + 日志回传，
- *       为 USB/ADB 通道与投屏接收开发收集硬件信息。
+ * EasyLink 车机端 v0.2.0
+ * 全屏壳 + 系统/驱动探测 + 触摸测试 + SD卡日志回传 +
+ * [安装MAP启动]：自复制到凯立德标准导航路径，供 MAP 键硬路径启动。
  */
 #include <windows.h>
 #include "log.h"
 #include "probe.h"
+#include "install.h"
 
-#define VER_W   L"v0.1.0"
-#define VER_A   "v0.1.0"
+#define VER_W   L"v0.2.0"
+#define VER_A   "v0.2.0"
+#define BTN_N   4
 
 #define WM_CLASS    L"EasyLinkMain"
 #define CLR_BG        RGB(16, 20, 26)
@@ -25,12 +27,12 @@
 
 static HWND       g_hwnd;
 static ProbeBasic g_basic;
-static RECT       g_btn[3];
+static RECT       g_btn[BTN_N];
 static int        g_btnDown = -1;
 static int        g_touchX, g_touchY, g_touchN;
 
-static const wchar_t* const kBtnLabel[3] = {
-    L"深度探测", L"刷新状态", L"清空日志"
+static const wchar_t* const kBtnLabel[BTN_N] = {
+    L"深度探测", L"安装MAP启动", L"刷新状态", L"清空日志"
 };
 
 /* ---------- 绘制辅助 ---------- */
@@ -109,8 +111,8 @@ static void layout(int w, int h)
     (void)h;
     bh = 34;
     by = 36 + 4 * 20 + 8;
-    bw = (w - bx * 2 - gap * 2) / 3;
-    for (i = 0; i < 3; i++) {
+    bw = (w - bx * 2 - gap * (BTN_N - 1)) / BTN_N;
+    for (i = 0; i < BTN_N; i++) {
         g_btn[i].left = bx + i * (bw + gap);
         g_btn[i].top = by;
         g_btn[i].right = g_btn[i].left + bw;
@@ -121,7 +123,7 @@ static void layout(int w, int h)
 static int hit_button(int x, int y)
 {
     int i;
-    for (i = 0; i < 3; i++)
+    for (i = 0; i < BTN_N; i++)
         if (x >= g_btn[i].left && x < g_btn[i].right &&
             y >= g_btn[i].top && y < g_btn[i].bottom)
             return i;
@@ -170,7 +172,7 @@ static void paint(HDC dc, RECT* rc)
     text_out(dc, 8, 100, tmp, CLR_DIM);
 
     /* 按钮 */
-    for (i = 0; i < 3; i++) {
+    for (i = 0; i < BTN_N; i++) {
         RECT rb = g_btn[i];
         RECT tr;
         fill_rect(dc, &rb, (i == g_btnDown) ? CLR_BTN_HI : CLR_BTN);
@@ -217,6 +219,7 @@ static LRESULT CALLBACK wnd_proc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp)
         if (!log_init())
             log_write("警告: 未找到可写存储，日志仅在内存");
         log_write("EasyLink 车机端 " VER_A " 启动");
+        log_write("提示: 按[安装MAP启动]后, MAP键可直接启动本程序");
         probe_basic(&g_basic);
         log_write("OS: %s", g_basic.os);
         log_write("存储: %s", g_basic.storage);
@@ -259,6 +262,9 @@ static LRESULT CALLBACK wnd_proc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp)
             if (b == 0) {
                 do_probe();
             } else if (b == 1) {
+                install_to_map();
+                InvalidateRect(hwnd, NULL, TRUE);
+            } else if (b == 2) {
                 probe_basic(&g_basic);
                 log_write(">> 状态已刷新");
                 InvalidateRect(hwnd, NULL, TRUE);

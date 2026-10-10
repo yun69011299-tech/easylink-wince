@@ -13,9 +13,9 @@ mkdir -p "$BUILD"
 cp -r "$REPO/src" "$BUILD/src"
 
 cd "$BUILD"
-$GCC -O2 -Wall -finput-charset=UTF-8 -o EasyLink.exe src/main.c src/log.c src/probe.c
+$GCC -O2 -Wall -finput-charset=UTF-8 -o EasyLink.exe src/main.c src/log.c src/probe.c src/install.c
 echo "--- 编译通过"
 
 mkdir -p "$REPO/dist"
-cp EasyLink.exe "$REPO/dist/EasyLink-v0.1.0.exe"
-echo "BUILD_OK -> $REPO/dist/EasyLink-v0.1.0.exe"
+cp EasyLink.exe "$REPO/dist/EasyLink-v0.2.0.exe"
+echo "BUILD_OK -> $REPO/dist/EasyLink-v0.2.0.exe"
