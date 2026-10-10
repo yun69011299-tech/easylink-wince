@@ -1,0 +1,925 @@
+﻿
+==== net.easyconn.carman.EncoderConfig ====
+
+  -- direct net.easyconn.carman.EncoderConfig.<init> --
+    invoke-direct {..}, java.lang.Object.<init>():V
+    iput v1, net.easyconn.carman.EncoderConfig.width
+    iput v2, net.easyconn.carman.EncoderConfig.height
+    iput v3, net.easyconn.carman.EncoderConfig.densityDpi
+    iput v4, net.easyconn.carman.EncoderConfig.fps
+    iput v5, net.easyconn.carman.EncoderConfig.bitRate
+    iput v6, net.easyconn.carman.EncoderConfig.iFrameIntervalSeconds
+    return-void
+
+  -- direct net.easyconn.carman.EncoderConfig.lowLoadDefault --
+    new-instance v0, android.util.DisplayMetrics
+    invoke-direct {..}, android.util.DisplayMetrics.<init>():V
+    const-string v1, "window"
+    invoke-virtual {..}, android.content.Context.getSystemService(java.lang.String):java.lang.Object
+    op_c
+    check-cast v11, android.view.WindowManager
+    invoke-interface {..}, android.view.WindowManager.getDefaultDisplay():android.view.Display
+    op_c
+    invoke-virtual {..}, android.view.Display.getRealMetrics(android.util.DisplayMetrics):V
+    iget v11, android.util.DisplayMetrics.widthPixels
+    iget v1, android.util.DisplayMetrics.heightPixels
+    invoke-static {..}, java.lang.Math.max(I,I):I
+    op_a
+    iget v1, android.util.DisplayMetrics.widthPixels
+    iget v2, android.util.DisplayMetrics.heightPixels
+    invoke-static {..}, java.lang.Math.min(I,I):I
+    op_a
+    const/16 v2, 1000
+    if-lt v?, +10b
+    const/16 v3, 854
+    goto
+    const/16 v3, 800
+    op_1
+    op_0
+    const/16 v3, 590
+    const/16 v4, 600
+    if-lt v?, +12b
+    if-ge v?, +8b
+    op_1
+    goto
+    const/16 v11, 480
+    op_1
+    if-lt v?, +12b
+    const v11, 1600000
+    goto
+    const v11, 1200000
+    op_1
+    new-instance v4, net.easyconn.carman.EncoderConfig
+    iget v7, android.util.DisplayMetrics.densityDpi
+    const/16 v8, 20
+    const/4 v10, 2
+    invoke-direct/range/range {v7..}, net.easyconn.carman.EncoderConfig.<init>(I,I,I,I,I,I):V
+    op_11
+
+==== net.easyconn.carman.LegacyTransport$1 ====
+
+  -- direct net.easyconn.carman.LegacyTransport$1.<init> --
+    iput-object v1, net.easyconn.carman.LegacyTransport$1.this$0
+    iput-object v2, net.easyconn.carman.LegacyTransport$1.val$socket
+    invoke-direct {..}, java.lang.Object.<init>():V
+    return-void
+
+  -- virtual net.easyconn.carman.LegacyTransport$1.run --
+    new-instance v0, java.io.BufferedReader
+    new-instance v1, java.io.InputStreamReader
+    iget-boolean v66, net.easyconn.carman.LegacyTransport$1.val$socket
+    invoke-virtual {..}, java.net.Socket.getInputStream():java.io.InputStream
+    op_c
+    op_62 v3, java.nio.charset.StandardCharsets.UTF_8
+    invoke-direct {..}, java.io.InputStreamReader.<init>(java.io.InputStream,java.nio.charset.Charset):V
+    invoke-direct {..}, java.io.BufferedReader.<init>(java.io.Reader):V
+    op_0
+    iget-boolean v65, net.easyconn.carman.LegacyTransport$1.this$0
+    invoke-static {..}, net.easyconn.carman.LegacyTransport.access$0(net.easyconn.carman.LegacyTransport):Z
+    op_a
+    if-eqz v?, +54b
+    invoke-virtual {..}, java.io.BufferedReader.readLine():java.lang.String
+    op_c
+    if-nez v?, +6b
+    goto
+    iget-boolean v66, net.easyconn.carman.LegacyTransport$1.this$0
+    invoke-virtual {..}, java.lang.String.trim():java.lang.String
+    op_c
+    invoke-static {..}, net.easyconn.carman.LegacyTransport.access$1(net.easyconn.carman.LegacyTransport,java.lang.String):V
+    goto
+    op_d
+    const-string v1, "EC47Transport"
+    const-string v2, "input closed"
+    invoke-static {..}, android.util.Log.d(java.lang.String,java.lang.String,java.lang.Throwable):I
+    return-void
+
+==== net.easyconn.carman.LegacyTransport$Frame ====
+
+  -- direct net.easyconn.carman.LegacyTransport$Frame.<init> --
+    invoke-direct {..}, java.lang.Object.<init>():V
+    iput v1, net.easyconn.carman.LegacyTransport$Frame.type
+    iput-boolean v2, net.easyconn.carman.LegacyTransport$Frame.presentationTimeUs
+    iput v4, net.easyconn.carman.LegacyTransport$Frame.flags
+    iput-object v5, net.easyconn.carman.LegacyTransport$Frame.payload
+    return-void
+
+  -- direct net.easyconn.carman.LegacyTransport$Frame.text --
+    new-instance v0, net.easyconn.carman.LegacyTransport$Frame
+    op_62 v1, java.nio.charset.StandardCharsets.UTF_8
+    invoke-virtual {..}, java.lang.String.getBytes(java.nio.charset.Charset):[B
+    op_c
+    op_16
+    const/4 v4, 0
+    op_1
+    invoke-direct/range/range {v6..}, net.easyconn.carman.LegacyTransport$Frame.<init>(I,J,I,[B):V
+    op_11
+
+==== net.easyconn.carman.LegacyTransport ====
+
+  -- direct net.easyconn.carman.LegacyTransport.<init> --
+    invoke-direct {..}, java.lang.Object.<init>():V
+    new-instance v0, java.util.concurrent.LinkedBlockingQueue
+    const/16 v1, 8
+    invoke-direct {..}, java.util.concurrent.LinkedBlockingQueue.<init>(I):V
+    iput-object v32, net.easyconn.carman.LegacyTransport.queue
+    return-void
+
+  -- direct net.easyconn.carman.LegacyTransport.access$0 --
+    iget-object v0, net.easyconn.carman.LegacyTransport.running
+    op_f
+
+  -- direct net.easyconn.carman.LegacyTransport.access$1 --
+    invoke-direct {..}, net.easyconn.carman.LegacyTransport.handleInput(java.lang.String):V
+    return-void
+
+  -- direct net.easyconn.carman.LegacyTransport.closeQuietly --
+    op_20
+    if-eqz v?, +20b
+    check-cast v1, java.lang.AutoCloseable
+    invoke-interface {..}, java.lang.AutoCloseable.close():V
+    goto
+    op_d
+    op_0
+    return-void
+
+  -- direct net.easyconn.carman.LegacyTransport.enqueue --
+    iget-boolean v16, net.easyconn.carman.LegacyTransport.queue
+    invoke-virtual {..}, java.util.concurrent.LinkedBlockingQueue.offer(java.lang.Object):Z
+    op_a
+    if-nez v?, +24b
+    iget-boolean v16, net.easyconn.carman.LegacyTransport.queue
+    invoke-virtual {..}, java.util.concurrent.LinkedBlockingQueue.poll():java.lang.Object
+    iget-boolean v16, net.easyconn.carman.LegacyTransport.queue
+    invoke-virtual {..}, java.util.concurrent.LinkedBlockingQueue.offer(java.lang.Object):Z
+    return-void
+
+  -- direct net.easyconn.carman.LegacyTransport.handleInput --
+    const-string v0, " "
+    invoke-virtual {..}, java.lang.String.split(java.lang.String):[Ljava.lang.String
+    op_c
+    op_21
+    const/4 v1, 2
+    const/4 v2, 1
+    const/4 v3, 0
+    const/4 v4, 3
+    if-ne v?, +56b
+    const-string v0, "tap"
+    op_46
+    invoke-virtual {..}, java.lang.String.equals(java.lang.Object):Z
+    op_a
+    if-eqz v?, +36b
+    op_46
+    invoke-direct {..}, net.easyconn.carman.LegacyTransport.parseFloat(java.lang.String):F
+    op_a
+    op_46
+    invoke-direct {..}, net.easyconn.carman.LegacyTransport.parseFloat(java.lang.String):F
+    op_a
+    invoke-static {..}, net.easyconn.carman.TouchAccessibilityService.tap(F,F):Z
+    goto
+    op_21
+    const/4 v5, 6
+    if-ne v?, +98b
+    const-string v0, "drag"
+    op_46
+    invoke-virtual {..}, java.lang.String.equals(java.lang.Object):Z
+    op_a
+    if-eqz v?, +78b
+    op_46
+    invoke-direct {..}, net.easyconn.carman.LegacyTransport.parseFloat(java.lang.String):F
+    op_a
+    op_46
+    invoke-direct {..}, net.easyconn.carman.LegacyTransport.parseFloat(java.lang.String):F
+    op_a
+    op_46
+    invoke-direct {..}, net.easyconn.carman.LegacyTransport.parseFloat(java.lang.String):F
+    op_a
+    const/4 v0, 4
+    op_46
+    invoke-direct {..}, net.easyconn.carman.LegacyTransport.parseFloat(java.lang.String):F
+    op_a
+    const/4 v0, 5
+    op_46
+    invoke-direct {..}, net.easyconn.carman.LegacyTransport.parseFloat(java.lang.String):F
+    op_a
+    op_88
+    invoke-static/range/range {v6..}, net.easyconn.carman.TouchAccessibilityService.drag(F,F,F,F,J):Z
+    goto
+    op_0
+    return-void
+
+  -- direct net.easyconn.carman.LegacyTransport.parseFloat --
+    invoke-static {..}, java.lang.Float.parseFloat(java.lang.String):F
+    op_a
+    op_f
+    op_d
+    const/4 v1, 0
+    op_f
+
+  -- direct net.easyconn.carman.LegacyTransport.sleepBeforeRetry --
+    op_16
+    invoke-static {..}, java.lang.Thread.sleep(J):V
+    goto
+    op_d
+    invoke-static {..}, java.lang.Thread.currentThread():java.lang.Thread
+    op_c
+    invoke-virtual {..}, java.lang.Thread.interrupt():V
+    return-void
+
+  -- direct net.easyconn.carman.LegacyTransport.startInputReader --
+    new-instance v0, java.lang.Thread
+    new-instance v1, net.easyconn.carman.LegacyTransport$1
+    invoke-direct {..}, net.easyconn.carman.LegacyTransport$1.<init>(net.easyconn.carman.LegacyTransport,java.net.Socket):V
+    op_0
+    const-string v3, "ec47-touch-input"
+    invoke-direct {..}, java.lang.Thread.<init>(java.lang.Runnable,java.lang.String):V
+    invoke-virtual {..}, java.lang.Thread.start():V
+    return-void
+
+  -- direct net.easyconn.carman.LegacyTransport.writeFrame --
+    iget-boolean v48, net.easyconn.carman.LegacyTransport.output
+    if-nez v?, +6b
+    return-void
+    iget-boolean v48, net.easyconn.carman.LegacyTransport.output
+    const v1, 1162032183
+    invoke-virtual {..}, java.io.DataOutputStream.writeInt(I):V
+    iget-boolean v48, net.easyconn.carman.LegacyTransport.output
+    iget v65, net.easyconn.carman.LegacyTransport$Frame.type
+    invoke-virtual {..}, java.io.DataOutputStream.writeByte(I):V
+    iget-boolean v48, net.easyconn.carman.LegacyTransport.output
+    iget v65, net.easyconn.carman.LegacyTransport$Frame.flags
+    invoke-virtual {..}, java.io.DataOutputStream.writeByte(I):V
+    iget-boolean v48, net.easyconn.carman.LegacyTransport.output
+    op_53 v65, net.easyconn.carman.LegacyTransport$Frame.presentationTimeUs
+    invoke-virtual {..}, java.io.DataOutputStream.writeLong(J):V
+    iget-boolean v48, net.easyconn.carman.LegacyTransport.output
+    iget-boolean v65, net.easyconn.carman.LegacyTransport$Frame.payload
+    op_21
+    invoke-virtual {..}, java.io.DataOutputStream.writeInt(I):V
+    iget-boolean v48, net.easyconn.carman.LegacyTransport.output
+    iget-boolean v68, net.easyconn.carman.LegacyTransport$Frame.payload
+    invoke-virtual {..}, java.io.DataOutputStream.write([B):V
+    iget-boolean v52, net.easyconn.carman.LegacyTransport.output
+    invoke-virtual {..}, java.io.DataOutputStream.flush():V
+    return-void
+
+  -- virtual net.easyconn.carman.LegacyTransport.reportError --
+    const-string v0, "EC47Transport"
+    invoke-static {..}, android.util.Log.e(java.lang.String,java.lang.String,java.lang.Throwable):I
+    new-instance v0, java.lang.StringBuilder
+    invoke-static {..}, java.lang.String.valueOf(java.lang.Object):java.lang.String
+    op_c
+    invoke-direct {..}, java.lang.StringBuilder.<init>(java.lang.String):V
+    const-string v2, ": "
+    invoke-virtual {..}, java.lang.StringBuilder.append(java.lang.String):java.lang.StringBuilder
+    op_c
+    invoke-virtual {..}, java.lang.Exception.getMessage():java.lang.String
+    op_c
+    invoke-virtual {..}, java.lang.StringBuilder.append(java.lang.String):java.lang.StringBuilder
+    op_c
+    invoke-virtual {..}, java.lang.StringBuilder.toString():java.lang.String
+    op_c
+    const/16 v3, 9
+    invoke-static {..}, net.easyconn.carman.LegacyTransport$Frame.text(I,java.lang.String):net.easyconn.carman.LegacyTransport$Frame
+    op_c
+    invoke-direct {..}, net.easyconn.carman.LegacyTransport.enqueue(net.easyconn.carman.LegacyTransport$Frame):V
+    return-void
+
+  -- virtual net.easyconn.carman.LegacyTransport.run --
+    op_0
+    iget-object v112, net.easyconn.carman.LegacyTransport.running
+    if-nez v?, +6b
+    return-void
+    const/4 v0, 0
+    new-instance v1, java.net.ServerSocket
+    const-string v2, "127.0.0.1"
+    invoke-static {..}, java.net.InetAddress.getByName(java.lang.String):java.net.InetAddress
+    op_c
+    const/4 v3, 1
+    const v4, 40690
+    invoke-direct {..}, java.net.ServerSocket.<init>(I,I,java.net.InetAddress):V
+    iput-object v113, net.easyconn.carman.LegacyTransport.server
+    iget-boolean v113, net.easyconn.carman.LegacyTransport.server
+    invoke-virtual {..}, java.net.ServerSocket.accept():java.net.Socket
+    op_c
+    invoke-direct {..}, net.easyconn.carman.LegacyTransport.startInputReader(java.net.Socket):V
+    new-instance v2, java.io.DataOutputStream
+    new-instance v4, java.io.BufferedOutputStream
+    invoke-virtual {..}, java.net.Socket.getOutputStream():java.io.OutputStream
+    op_c
+    op_15 v6, 10000h
+    invoke-direct {..}, java.io.BufferedOutputStream.<init>(java.io.OutputStream,I):V
+    invoke-direct {..}, java.io.DataOutputStream.<init>(java.io.OutputStream):V
+    iput-object v114, net.easyconn.carman.LegacyTransport.output
+    const-string v2, "EC47;h264;baseline;port=40690"
+    invoke-static {..}, net.easyconn.carman.LegacyTransport$Frame.text(I,java.lang.String):net.easyconn.carman.LegacyTransport$Frame
+    op_c
+    invoke-direct {..}, net.easyconn.carman.LegacyTransport.writeFrame(net.easyconn.carman.LegacyTransport$Frame):V
+    op_0
+    iget-object v114, net.easyconn.carman.LegacyTransport.running
+    if-eqz v?, +68b
+    invoke-virtual {..}, java.net.Socket.isClosed():Z
+    op_a
+    if-eqz v?, +6b
+    goto
+    iget-boolean v114, net.easyconn.carman.LegacyTransport.queue
+    invoke-virtual {..}, java.util.concurrent.LinkedBlockingQueue.take():java.lang.Object
+    op_c
+    check-cast v2, net.easyconn.carman.LegacyTransport$Frame
+    invoke-direct {..}, net.easyconn.carman.LegacyTransport.writeFrame(net.easyconn.carman.LegacyTransport$Frame):V
+    goto
+    op_d
+    goto
+    op_d
+    const-string v2, "EC47Transport"
+    const-string v3, "transport"
+    invoke-static {..}, android.util.Log.e(java.lang.String,java.lang.String,java.lang.Throwable):I
+    invoke-direct {..}, net.easyconn.carman.LegacyTransport.sleepBeforeRetry():V
+    iget-boolean v113, net.easyconn.carman.LegacyTransport.output
+    invoke-static {..}, net.easyconn.carman.LegacyTransport.closeQuietly(java.lang.Object):V
+    iput-object v112, net.easyconn.carman.LegacyTransport.output
+    iget-boolean v113, net.easyconn.carman.LegacyTransport.server
+    invoke-static {..}, net.easyconn.carman.LegacyTransport.closeQuietly(java.lang.Object):V
+    iput-object v112, net.easyconn.carman.LegacyTransport.server
+    goto
+    iget-boolean v114, net.easyconn.carman.LegacyTransport.output
+    invoke-static {..}, net.easyconn.carman.LegacyTransport.closeQuietly(java.lang.Object):V
+    iput-object v112, net.easyconn.carman.LegacyTransport.output
+    iget-boolean v114, net.easyconn.carman.LegacyTransport.server
+    invoke-static {..}, net.easyconn.carman.LegacyTransport.closeQuietly(java.lang.Object):V
+    iput-object v112, net.easyconn.carman.LegacyTransport.server
+    op_27
+
+  -- virtual net.easyconn.carman.LegacyTransport.sendFormat --
+    const/4 v0, 2
+    invoke-virtual {..}, android.media.MediaFormat.toString():java.lang.String
+    op_c
+    invoke-static {..}, net.easyconn.carman.LegacyTransport$Frame.text(I,java.lang.String):net.easyconn.carman.LegacyTransport$Frame
+    op_c
+    invoke-direct {..}, net.easyconn.carman.LegacyTransport.enqueue(net.easyconn.carman.LegacyTransport$Frame):V
+    return-void
+
+  -- virtual net.easyconn.carman.LegacyTransport.sendVideo --
+    iget v144, android.media.MediaCodec$BufferInfo.size
+    op_23
+    invoke-virtual {..}, java.nio.ByteBuffer.get([B):java.nio.ByteBuffer
+    new-instance v1, net.easyconn.carman.LegacyTransport$Frame
+    op_53 v147, android.media.MediaCodec$BufferInfo.presentationTimeUs
+    iget v149, android.media.MediaCodec$BufferInfo.flags
+    const/4 v2, 3
+    invoke-direct/range/range {v6..}, net.easyconn.carman.LegacyTransport$Frame.<init>(I,J,I,[B):V
+    invoke-direct {..}, net.easyconn.carman.LegacyTransport.enqueue(net.easyconn.carman.LegacyTransport$Frame):V
+    return-void
+
+  -- virtual net.easyconn.carman.LegacyTransport.start --
+    const/4 v0, 1
+    op_5c v32, net.easyconn.carman.LegacyTransport.running
+    new-instance v0, java.lang.Thread
+    const-string v1, "ec47-legacy-transport"
+    invoke-direct {..}, java.lang.Thread.<init>(java.lang.Runnable,java.lang.String):V
+    iput-object v32, net.easyconn.carman.LegacyTransport.thread
+    iget-boolean v32, net.easyconn.carman.LegacyTransport.thread
+    invoke-virtual {..}, java.lang.Thread.start():V
+    return-void
+
+  -- virtual net.easyconn.carman.LegacyTransport.stop --
+    const/4 v0, 0
+    op_5c v16, net.easyconn.carman.LegacyTransport.running
+    iget-boolean v16, net.easyconn.carman.LegacyTransport.output
+    invoke-static {..}, net.easyconn.carman.LegacyTransport.closeQuietly(java.lang.Object):V
+    iget-boolean v16, net.easyconn.carman.LegacyTransport.server
+    invoke-static {..}, net.easyconn.carman.LegacyTransport.closeQuietly(java.lang.Object):V
+    iget-boolean v16, net.easyconn.carman.LegacyTransport.thread
+    if-eqz v?, +14b
+    iget-boolean v16, net.easyconn.carman.LegacyTransport.thread
+    invoke-virtual {..}, java.lang.Thread.interrupt():V
+    return-void
+
+==== net.easyconn.carman.MainActivity$1 ====
+
+  -- direct net.easyconn.carman.MainActivity$1.<init> --
+    iput-object v1, net.easyconn.carman.MainActivity$1.this$0
+    invoke-direct {..}, java.lang.Object.<init>():V
+    return-void
+
+  -- virtual net.easyconn.carman.MainActivity$1.onClick --
+    iget-boolean v1, net.easyconn.carman.MainActivity$1.this$0
+    invoke-static {..}, net.easyconn.carman.MainActivity.access$0(net.easyconn.carman.MainActivity):V
+    return-void
+
+==== net.easyconn.carman.MainActivity ====
+
+  -- direct net.easyconn.carman.MainActivity.<init> --
+    invoke-direct {..}, android.app.Activity.<init>():V
+    return-void
+
+  -- direct net.easyconn.carman.MainActivity.access$0 --
+    invoke-direct {..}, net.easyconn.carman.MainActivity.requestProjection():V
+    return-void
+
+  -- direct net.easyconn.carman.MainActivity.maybeAutoRequestProjection --
+    invoke-virtual {..}, net.easyconn.carman.MainActivity.getIntent():android.content.Intent
+    op_c
+    iget-object v33, net.easyconn.carman.MainActivity.autoRequestUsed
+    if-nez v?, +40b
+    if-eqz v?, +36b
+    const-string v1, "ec47_source"
+    invoke-virtual {..}, android.content.Intent.hasExtra(java.lang.String):Z
+    op_a
+    if-nez v?, +6b
+    goto
+    const/4 v0, 1
+    op_5c v32, net.easyconn.carman.MainActivity.autoRequestUsed
+    invoke-direct {..}, net.easyconn.carman.MainActivity.requestProjection():V
+    return-void
+    return-void
+
+  -- direct net.easyconn.carman.MainActivity.requestProjection --
+    iget-boolean v32, net.easyconn.carman.MainActivity.projectionManager
+    invoke-virtual {..}, android.media.projection.MediaProjectionManager.createScreenCaptureIntent():android.content.Intent
+    op_c
+    const/16 v1, 4700
+    invoke-virtual {..}, net.easyconn.carman.MainActivity.startActivityForResult(android.content.Intent,I):V
+    return-void
+
+  -- virtual net.easyconn.carman.MainActivity.onActivityResult --
+    invoke-super {..}, android.app.Activity.onActivityResult(I,I,android.content.Intent):V
+    const/16 v0, 4700
+    if-ne v?, +78b
+    const/4 v2, -1
+    if-ne v?, +72b
+    if-nez v?, +6b
+    goto
+    new-instance v2, android.content.Intent
+    const-class v0, net.easyconn.carman.ProjectionService
+    invoke-direct {..}, android.content.Intent.<init>(android.content.Context,java.lang.Class):V
+    const-string v0, "result_code"
+    invoke-virtual {..}, android.content.Intent.putExtra(java.lang.String,I):android.content.Intent
+    const-string v3, "result_data"
+    invoke-virtual {..}, android.content.Intent.putExtra(java.lang.String,android.os.Parcelable):android.content.Intent
+    op_60 v3, android.os.Build$VERSION.SDK_INT
+    const/16 v4, 26
+    if-lt v?, +12b
+    invoke-virtual {..}, net.easyconn.carman.MainActivity.startForegroundService(android.content.Intent):android.content.ComponentName
+    goto
+    invoke-virtual {..}, net.easyconn.carman.MainActivity.startService(android.content.Intent):android.content.ComponentName
+    return-void
+    return-void
+
+  -- virtual net.easyconn.carman.MainActivity.onCreate --
+    invoke-super {..}, android.app.Activity.onCreate(android.os.Bundle):V
+    const-string v6, "media_projection"
+    invoke-virtual {..}, net.easyconn.carman.MainActivity.getSystemService(java.lang.String):java.lang.Object
+    op_c
+    check-cast v6, android.media.projection.MediaProjectionManager
+    iput-object v86, net.easyconn.carman.MainActivity.projectionManager
+    op_60 v6, android.os.Build$VERSION.SDK_INT
+    const/16 v0, 33
+    if-lt v?, +26b
+    const-string v6, "android.permission.POST_NOTIFICATIONS"
+    op_24
+    op_c
+    const/16 v0, 4701
+    invoke-virtual {..}, net.easyconn.carman.MainActivity.requestPermissions([Ljava.lang.String,I):V
+    new-instance v6, android.widget.LinearLayout
+    invoke-direct {..}, android.widget.LinearLayout.<init>(android.content.Context):V
+    const/4 v0, 1
+    invoke-virtual {..}, android.widget.LinearLayout.setOrientation(I):V
+    const/16 v0, 17
+    invoke-virtual {..}, android.widget.LinearLayout.setGravity(I):V
+    const/16 v1, 32
+    invoke-virtual {..}, android.widget.LinearLayout.setPadding(I,I,I,I):V
+    new-instance v1, android.widget.TextView
+    invoke-direct {..}, android.widget.TextView.<init>(android.content.Context):V
+    const-string v2, "EasyConnected 4.7"
+    invoke-virtual {..}, android.widget.TextView.setText(java.lang.CharSequence):V
+    op_15 v2, 168320000h
+    invoke-virtual {..}, android.widget.TextView.setTextSize(F):V
+    invoke-virtual {..}, android.widget.TextView.setGravity(I):V
+    new-instance v2, android.widget.TextView
+    invoke-direct {..}, android.widget.TextView.<init>(android.content.Context):V
+    const-string v3, "Connect the car unit, then start screen sharing here."
+    invoke-virtual {..}, android.widget.TextView.setText(java.lang.CharSequence):V
+    invoke-virtual {..}, android.widget.TextView.setGravity(I):V
+    const/4 v0, 0
+    const/16 v3, 24
+    invoke-virtual {..}, android.widget.TextView.setPadding(I,I,I,I):V
+    new-instance v3, android.widget.Button
+    invoke-direct {..}, android.widget.Button.<init>(android.content.Context):V
+    const-string v4, "Start"
+    invoke-virtual {..}, android.widget.Button.setText(java.lang.CharSequence):V
+    invoke-virtual {..}, android.widget.Button.setAllCaps(Z):V
+    new-instance v0, net.easyconn.carman.MainActivity$1
+    invoke-direct {..}, net.easyconn.carman.MainActivity$1.<init>(net.easyconn.carman.MainActivity):V
+    invoke-virtual {..}, android.widget.Button.setOnClickListener(android.view.View$OnClickListener):V
+    invoke-virtual {..}, android.widget.LinearLayout.addView(android.view.View):V
+    invoke-virtual {..}, android.widget.LinearLayout.addView(android.view.View):V
+    invoke-virtual {..}, android.widget.LinearLayout.addView(android.view.View):V
+    invoke-virtual {..}, net.easyconn.carman.MainActivity.setContentView(android.view.View):V
+    invoke-direct {..}, net.easyconn.carman.MainActivity.maybeAutoRequestProjection():V
+    return-void
+
+==== net.easyconn.carman.ProjectionService ====
+
+  -- direct net.easyconn.carman.ProjectionService.<init> --
+    invoke-direct {..}, android.app.Service.<init>():V
+    return-void
+
+  -- direct net.easyconn.carman.ProjectionService.startAsForeground --
+    const-string v0, "notification"
+    invoke-virtual {..}, net.easyconn.carman.ProjectionService.getSystemService(java.lang.String):java.lang.Object
+    op_c
+    check-cast v0, android.app.NotificationManager
+    op_60 v1, android.os.Build$VERSION.SDK_INT
+    const-string v2, "easyconnected_projection"
+    const/16 v3, 26
+    if-lt v?, +32b
+    new-instance v1, android.app.NotificationChannel
+    op_0
+    op_0
+    op_0
+    const-string v4, "EasyConnected Projection"
+    const/4 v5, 2
+    invoke-direct {..}, android.app.NotificationChannel.<init>(java.lang.String,java.lang.CharSequence,I):V
+    invoke-virtual {..}, android.app.NotificationManager.createNotificationChannel(android.app.NotificationChannel):V
+    op_60 v0, android.os.Build$VERSION.SDK_INT
+    if-lt v?, +16b
+    new-instance v0, android.app.Notification$Builder
+    invoke-direct {..}, android.app.Notification$Builder.<init>(android.content.Context,java.lang.String):V
+    goto
+    new-instance v0, android.app.Notification$Builder
+    invoke-direct {..}, android.app.Notification$Builder.<init>(android.content.Context):V
+    op_0
+    op_0
+    const-string v1, "EasyConnected 4.7"
+    invoke-virtual {..}, android.app.Notification$Builder.setContentTitle(java.lang.CharSequence):android.app.Notification$Builder
+    op_c
+    const-string v1, "Screen sharing is active"
+    invoke-virtual {..}, android.app.Notification$Builder.setContentText(java.lang.CharSequence):android.app.Notification$Builder
+    op_c
+    const v1, 17301678
+    invoke-virtual {..}, android.app.Notification$Builder.setSmallIcon(I):android.app.Notification$Builder
+    op_c
+    const/4 v1, 1
+    invoke-virtual {..}, android.app.Notification$Builder.setOngoing(Z):android.app.Notification$Builder
+    op_c
+    invoke-virtual {..}, android.app.Notification$Builder.build():android.app.Notification
+    op_c
+    op_0
+    op_60 v1, android.os.Build$VERSION.SDK_INT
+    const/16 v2, 34
+    const/16 v3, 47
+    if-lt v?, +24b
+    op_0
+    op_0
+    op_0
+    op_0
+    const/16 v1, 32
+    invoke-virtual {..}, net.easyconn.carman.ProjectionService.startForeground(I,android.app.Notification,I):V
+    goto
+    invoke-virtual {..}, net.easyconn.carman.ProjectionService.startForeground(I,android.app.Notification):V
+    return-void
+
+  -- virtual net.easyconn.carman.ProjectionService.onBind --
+    const/4 v1, 0
+    op_11
+
+  -- virtual net.easyconn.carman.ProjectionService.onCreate --
+    invoke-super {..}, android.app.Service.onCreate():V
+    invoke-direct {..}, net.easyconn.carman.ProjectionService.startAsForeground():V
+    return-void
+
+  -- virtual net.easyconn.carman.ProjectionService.onDestroy --
+    iget-boolean v16, net.easyconn.carman.ProjectionService.encoder
+    if-eqz v?, +14b
+    iget-boolean v16, net.easyconn.carman.ProjectionService.encoder
+    invoke-virtual {..}, net.easyconn.carman.ScreenEncoder.stop():V
+    iget-boolean v16, net.easyconn.carman.ProjectionService.transport
+    if-eqz v?, +14b
+    iget-boolean v16, net.easyconn.carman.ProjectionService.transport
+    invoke-virtual {..}, net.easyconn.carman.LegacyTransport.stop():V
+    iget-boolean v16, net.easyconn.carman.ProjectionService.projection
+    if-eqz v?, +14b
+    iget-boolean v16, net.easyconn.carman.ProjectionService.projection
+    invoke-virtual {..}, android.media.projection.MediaProjection.stop():V
+    invoke-super {..}, android.app.Service.onDestroy():V
+    return-void
+
+  -- virtual net.easyconn.carman.ProjectionService.onStartCommand --
+    const/4 v3, 2
+    if-nez v?, +12b
+    invoke-virtual {..}, net.easyconn.carman.ProjectionService.stopSelf():V
+    op_f
+    const-string v4, "result_code"
+    const/4 v0, 0
+    invoke-virtual {..}, android.content.Intent.getIntExtra(java.lang.String,I):I
+    op_a
+    const-string v0, "result_data"
+    invoke-virtual {..}, android.content.Intent.getParcelableExtra(java.lang.String):android.os.Parcelable
+    op_c
+    check-cast v2, android.content.Intent
+    if-eqz v?, +108b
+    if-nez v?, +6b
+    goto
+    const-string v3, "media_projection"
+    invoke-virtual {..}, net.easyconn.carman.ProjectionService.getSystemService(java.lang.String):java.lang.Object
+    op_c
+    check-cast v3, android.media.projection.MediaProjectionManager
+    op_0
+    invoke-virtual {..}, android.media.projection.MediaProjectionManager.getMediaProjection(I,android.content.Intent):android.media.projection.MediaProjection
+    op_c
+    iput-object v18, net.easyconn.carman.ProjectionService.projection
+    new-instance v2, net.easyconn.carman.LegacyTransport
+    invoke-direct {..}, net.easyconn.carman.LegacyTransport.<init>():V
+    iput-object v18, net.easyconn.carman.ProjectionService.transport
+    iget-boolean v18, net.easyconn.carman.ProjectionService.transport
+    invoke-virtual {..}, net.easyconn.carman.LegacyTransport.start():V
+    invoke-static {..}, net.easyconn.carman.EncoderConfig.lowLoadDefault(android.content.Context):net.easyconn.carman.EncoderConfig
+    op_c
+    new-instance v3, net.easyconn.carman.ScreenEncoder
+    iget-boolean v20, net.easyconn.carman.ProjectionService.projection
+    iget-boolean v16, net.easyconn.carman.ProjectionService.transport
+    invoke-direct {..}, net.easyconn.carman.ScreenEncoder.<init>(android.media.projection.MediaProjection,net.easyconn.carman.EncoderConfig,net.easyconn.carman.LegacyTransport):V
+    iput-object v19, net.easyconn.carman.ProjectionService.encoder
+    iget-boolean v18, net.easyconn.carman.ProjectionService.encoder
+    invoke-virtual {..}, net.easyconn.carman.ScreenEncoder.start():V
+    const/4 v2, 1
+    op_f
+    invoke-virtual {..}, net.easyconn.carman.ProjectionService.stopSelf():V
+    op_f
+
+==== net.easyconn.carman.R$string ====
+
+  -- direct net.easyconn.carman.R$string.<init> --
+    invoke-direct {..}, java.lang.Object.<init>():V
+    return-void
+
+==== net.easyconn.carman.R$style ====
+
+  -- direct net.easyconn.carman.R$style.<init> --
+    invoke-direct {..}, java.lang.Object.<init>():V
+    return-void
+
+==== net.easyconn.carman.R$xml ====
+
+  -- direct net.easyconn.carman.R$xml.<init> --
+    invoke-direct {..}, java.lang.Object.<init>():V
+    return-void
+
+==== net.easyconn.carman.R ====
+
+  -- direct net.easyconn.carman.R.<init> --
+    invoke-direct {..}, java.lang.Object.<init>():V
+    return-void
+
+==== net.easyconn.carman.ScreenEncoder ====
+
+  -- direct net.easyconn.carman.ScreenEncoder.<init> --
+    invoke-direct {..}, java.lang.Object.<init>():V
+    iput-object v1, net.easyconn.carman.ScreenEncoder.projection
+    iput-object v2, net.easyconn.carman.ScreenEncoder.config
+    iput-object v3, net.easyconn.carman.ScreenEncoder.transport
+    return-void
+
+  -- direct net.easyconn.carman.ScreenEncoder.drainEncoder --
+    new-instance v0, android.media.MediaCodec$BufferInfo
+    invoke-direct {..}, android.media.MediaCodec$BufferInfo.<init>():V
+    op_0
+    iget-object v81, net.easyconn.carman.ScreenEncoder.running
+    if-nez v?, +6b
+    return-void
+    iget-boolean v81, net.easyconn.carman.ScreenEncoder.codec
+    op_16
+    invoke-virtual {..}, android.media.MediaCodec.dequeueOutputBuffer(android.media.MediaCodec$BufferInfo,J):I
+    op_a
+    const/4 v2, -2
+    if-ne v?, +28b
+    iget-boolean v81, net.easyconn.carman.ScreenEncoder.transport
+    iget-boolean v82, net.easyconn.carman.ScreenEncoder.codec
+    invoke-virtual {..}, android.media.MediaCodec.getOutputFormat():android.media.MediaFormat
+    op_c
+    invoke-virtual {..}, net.easyconn.carman.LegacyTransport.sendFormat(android.media.MediaFormat):V
+    goto
+    if-ltz v?, +90b
+    iget-boolean v82, net.easyconn.carman.ScreenEncoder.codec
+    invoke-virtual {..}, android.media.MediaCodec.getOutputBuffer(I):java.nio.ByteBuffer
+    op_c
+    if-eqz v?, +60b
+    iget v3, android.media.MediaCodec$BufferInfo.size
+    if-lez v?, +52b
+    iget v3, android.media.MediaCodec$BufferInfo.offset
+    invoke-virtual {..}, java.nio.ByteBuffer.position(I):java.nio.Buffer
+    op_c
+    check-cast v3, java.nio.ByteBuffer
+    iget v3, android.media.MediaCodec$BufferInfo.offset
+    iget v4, android.media.MediaCodec$BufferInfo.size
+    op_b0
+    invoke-virtual {..}, java.nio.ByteBuffer.limit(I):java.nio.Buffer
+    op_c
+    check-cast v3, java.nio.ByteBuffer
+    iget-boolean v83, net.easyconn.carman.ScreenEncoder.transport
+    invoke-virtual {..}, net.easyconn.carman.LegacyTransport.sendVideo(java.nio.ByteBuffer,android.media.MediaCodec$BufferInfo):V
+    iget-boolean v82, net.easyconn.carman.ScreenEncoder.codec
+    const/4 v3, 0
+    invoke-virtual {..}, android.media.MediaCodec.releaseOutputBuffer(I,Z):V
+    goto
+    goto
+
+  -- direct net.easyconn.carman.ScreenEncoder.release --
+    iget-boolean v32, net.easyconn.carman.ScreenEncoder.display
+    const/4 v1, 0
+    if-eqz v?, +18b
+    iget-boolean v32, net.easyconn.carman.ScreenEncoder.display
+    invoke-virtual {..}, android.hardware.display.VirtualDisplay.release():V
+    iput-object v33, net.easyconn.carman.ScreenEncoder.display
+    iget-boolean v32, net.easyconn.carman.ScreenEncoder.inputSurface
+    if-eqz v?, +18b
+    iget-boolean v32, net.easyconn.carman.ScreenEncoder.inputSurface
+    invoke-virtual {..}, android.view.Surface.release():V
+    iput-object v33, net.easyconn.carman.ScreenEncoder.inputSurface
+    iget-boolean v32, net.easyconn.carman.ScreenEncoder.codec
+    if-eqz v?, +34b
+    iget-boolean v32, net.easyconn.carman.ScreenEncoder.codec
+    invoke-virtual {..}, android.media.MediaCodec.stop():V
+    goto
+    op_d
+    op_0
+    iget-boolean v32, net.easyconn.carman.ScreenEncoder.codec
+    invoke-virtual {..}, android.media.MediaCodec.release():V
+    iput-object v33, net.easyconn.carman.ScreenEncoder.codec
+    return-void
+
+  -- virtual net.easyconn.carman.ScreenEncoder.run --
+    const-string v0, "video/avc"
+    invoke-static {..}, android.media.MediaCodec.createEncoderByType(java.lang.String):android.media.MediaCodec
+    op_c
+    iput-object v161, net.easyconn.carman.ScreenEncoder.codec
+    iget-boolean v161, net.easyconn.carman.ScreenEncoder.config
+    iget v17, net.easyconn.carman.EncoderConfig.width
+    iget-boolean v162, net.easyconn.carman.ScreenEncoder.config
+    iget v34, net.easyconn.carman.EncoderConfig.height
+    invoke-static {..}, android.media.MediaFormat.createVideoFormat(java.lang.String,I,I):android.media.MediaFormat
+    op_c
+    const-string v1, "color-format"
+    op_0
+    const v2, 2130708361
+    invoke-virtual {..}, android.media.MediaFormat.setInteger(java.lang.String,I):V
+    const-string v1, "bitrate"
+    iget-boolean v162, net.easyconn.carman.ScreenEncoder.config
+    iget v34, net.easyconn.carman.EncoderConfig.bitRate
+    invoke-virtual {..}, android.media.MediaFormat.setInteger(java.lang.String,I):V
+    const-string v1, "frame-rate"
+    iget-boolean v162, net.easyconn.carman.ScreenEncoder.config
+    iget v34, net.easyconn.carman.EncoderConfig.fps
+    invoke-virtual {..}, android.media.MediaFormat.setInteger(java.lang.String,I):V
+    const-string v1, "i-frame-interval"
+    iget-boolean v162, net.easyconn.carman.ScreenEncoder.config
+    iget v34, net.easyconn.carman.EncoderConfig.iFrameIntervalSeconds
+    invoke-virtual {..}, android.media.MediaFormat.setInteger(java.lang.String,I):V
+    const-string v1, "profile"
+    op_0
+    const/4 v2, 1
+    invoke-virtual {..}, android.media.MediaFormat.setInteger(java.lang.String,I):V
+    iget-boolean v161, net.easyconn.carman.ScreenEncoder.codec
+    const/4 v3, 0
+    invoke-virtual {..}, android.media.MediaCodec.configure(android.media.MediaFormat,android.view.Surface,android.media.MediaCrypto,I):V
+    iget-boolean v160, net.easyconn.carman.ScreenEncoder.codec
+    invoke-virtual {..}, android.media.MediaCodec.createInputSurface():android.view.Surface
+    op_c
+    iput-object v160, net.easyconn.carman.ScreenEncoder.inputSurface
+    iget-boolean v160, net.easyconn.carman.ScreenEncoder.codec
+    invoke-virtual {..}, android.media.MediaCodec.start():V
+    iget-boolean v161, net.easyconn.carman.ScreenEncoder.projection
+    const-string v2, "EC47Projection"
+    iget-boolean v160, net.easyconn.carman.ScreenEncoder.config
+    iget v3, net.easyconn.carman.EncoderConfig.width
+    iget-boolean v160, net.easyconn.carman.ScreenEncoder.config
+    iget v4, net.easyconn.carman.EncoderConfig.height
+    iget-boolean v160, net.easyconn.carman.ScreenEncoder.config
+    iget v5, net.easyconn.carman.EncoderConfig.densityDpi
+    op_0
+    iget-boolean v167, net.easyconn.carman.ScreenEncoder.inputSurface
+    op_0
+    op_0
+    const/16 v6, 16
+    const/4 v8, 0
+    const/4 v9, 0
+    invoke-virtual/range/range {v9..}, android.media.projection.MediaProjection.createVirtualDisplay(java.lang.String,I,I,I,I,android.view.Surface,android.hardware.display.VirtualDisplay$Callback,android.os.Handler):android.hardware.display.VirtualDisplay
+    op_c
+    iput-object v160, net.easyconn.carman.ScreenEncoder.display
+    invoke-direct {..}, net.easyconn.carman.ScreenEncoder.drainEncoder():V
+    goto
+    op_d
+    goto
+    op_d
+    iget-boolean v161, net.easyconn.carman.ScreenEncoder.transport
+    const-string v2, "encoder"
+    invoke-virtual {..}, net.easyconn.carman.LegacyTransport.reportError(java.lang.String,java.lang.Exception):V
+    invoke-direct {..}, net.easyconn.carman.ScreenEncoder.release():V
+    return-void
+    invoke-direct {..}, net.easyconn.carman.ScreenEncoder.release():V
+    op_27
+
+  -- virtual net.easyconn.carman.ScreenEncoder.start --
+    const/4 v0, 1
+    op_5c v32, net.easyconn.carman.ScreenEncoder.running
+    new-instance v0, java.lang.Thread
+    const-string v1, "ec47-screen-encoder"
+    invoke-direct {..}, java.lang.Thread.<init>(java.lang.Runnable,java.lang.String):V
+    iput-object v32, net.easyconn.carman.ScreenEncoder.thread
+    iget-boolean v32, net.easyconn.carman.ScreenEncoder.thread
+    invoke-virtual {..}, java.lang.Thread.start():V
+    return-void
+
+  -- virtual net.easyconn.carman.ScreenEncoder.stop --
+    const/4 v0, 0
+    op_5c v16, net.easyconn.carman.ScreenEncoder.running
+    iget-boolean v16, net.easyconn.carman.ScreenEncoder.thread
+    if-eqz v?, +14b
+    iget-boolean v16, net.easyconn.carman.ScreenEncoder.thread
+    invoke-virtual {..}, java.lang.Thread.interrupt():V
+    invoke-direct {..}, net.easyconn.carman.ScreenEncoder.release():V
+    return-void
+
+==== net.easyconn.carman.TouchAccessibilityService ====
+
+  -- direct net.easyconn.carman.TouchAccessibilityService.<init> --
+    invoke-direct {..}, android.accessibilityservice.AccessibilityService.<init>():V
+    return-void
+
+  -- direct net.easyconn.carman.TouchAccessibilityService.drag --
+    op_62 v0, net.easyconn.carman.TouchAccessibilityService.instance
+    if-eqz v?, +110b
+    op_60 v1, android.os.Build$VERSION.SDK_INT
+    const/16 v2, 24
+    if-ge v?, +6b
+    goto
+    op_1
+    new-instance v4, android.graphics.Path
+    invoke-direct {..}, android.graphics.Path.<init>():V
+    invoke-virtual {..}, android.graphics.Path.moveTo(F,F):V
+    invoke-virtual {..}, android.graphics.Path.lineTo(F,F):V
+    new-instance v3, android.accessibilityservice.GestureDescription$StrokeDescription
+    op_16
+    invoke-static {..}, java.lang.Math.max(J,J):J
+    op_b
+    op_16
+    invoke-direct/range/range {v6..}, android.accessibilityservice.GestureDescription$StrokeDescription.<init>(android.graphics.Path,J,J):V
+    op_0
+    new-instance v4, android.accessibilityservice.GestureDescription$Builder
+    invoke-direct {..}, android.accessibilityservice.GestureDescription$Builder.<init>():V
+    invoke-virtual {..}, android.accessibilityservice.GestureDescription$Builder.addStroke(android.accessibilityservice.GestureDescription$StrokeDescription):android.accessibilityservice.GestureDescription$Builder
+    op_c
+    invoke-virtual {..}, android.accessibilityservice.GestureDescription$Builder.build():android.accessibilityservice.GestureDescription
+    op_c
+    op_0
+    const/4 v4, 0
+    invoke-virtual {..}, net.easyconn.carman.TouchAccessibilityService.dispatchGesture(android.accessibilityservice.GestureDescription,android.accessibilityservice.AccessibilityService$GestureResultCallback,android.os.Handler):Z
+    op_a
+    op_f
+    const/4 v3, 0
+    op_f
+
+  -- direct net.easyconn.carman.TouchAccessibilityService.tap --
+    op_62 v0, net.easyconn.carman.TouchAccessibilityService.instance
+    if-eqz v?, +94b
+    op_60 v1, android.os.Build$VERSION.SDK_INT
+    const/16 v2, 24
+    if-ge v?, +6b
+    goto
+    new-instance v4, android.graphics.Path
+    invoke-direct {..}, android.graphics.Path.<init>():V
+    invoke-virtual {..}, android.graphics.Path.moveTo(F,F):V
+    new-instance v3, android.accessibilityservice.GestureDescription$StrokeDescription
+    op_16
+    op_16
+    invoke-direct/range/range {v6..}, android.accessibilityservice.GestureDescription$StrokeDescription.<init>(android.graphics.Path,J,J):V
+    op_0
+    new-instance v9, android.accessibilityservice.GestureDescription$Builder
+    invoke-direct {..}, android.accessibilityservice.GestureDescription$Builder.<init>():V
+    invoke-virtual {..}, android.accessibilityservice.GestureDescription$Builder.addStroke(android.accessibilityservice.GestureDescription$StrokeDescription):android.accessibilityservice.GestureDescription$Builder
+    op_c
+    invoke-virtual {..}, android.accessibilityservice.GestureDescription$Builder.build():android.accessibilityservice.GestureDescription
+    op_c
+    op_0
+    const/4 v10, 0
+    invoke-virtual {..}, net.easyconn.carman.TouchAccessibilityService.dispatchGesture(android.accessibilityservice.GestureDescription,android.accessibilityservice.AccessibilityService$GestureResultCallback,android.os.Handler):Z
+    op_a
+    op_f
+    const/4 v9, 0
+    op_f
+
+  -- virtual net.easyconn.carman.TouchAccessibilityService.onAccessibilityEvent --
+    return-void
+
+  -- virtual net.easyconn.carman.TouchAccessibilityService.onDestroy --
+    const/4 v0, 0
+    sput-object v0, net.easyconn.carman.TouchAccessibilityService.instance
+    invoke-super {..}, android.accessibilityservice.AccessibilityService.onDestroy():V
+    return-void
+
+  -- virtual net.easyconn.carman.TouchAccessibilityService.onInterrupt --
+    return-void
+
+  -- virtual net.easyconn.carman.TouchAccessibilityService.onServiceConnected --
+    sput-object v0, net.easyconn.carman.TouchAccessibilityService.instance
+    return-void

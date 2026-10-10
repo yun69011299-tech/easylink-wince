@@ -1,0 +1,13 @@
+# 解包产物（可由 APK 重新生成）
+apk_out/
+app.zip
+
+# 构建中间产物（最终发布 exe 放 car/dist/）
+*.o
+*.obj
+/tmp/
+
+# 日志与系统文件
+*.log
+Thumbs.db
+.DS_Store
