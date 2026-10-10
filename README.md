@@ -53,3 +53,9 @@ wsl -d Ubuntu -u root -- bash /mnt/d/LGramfiles/trae/car/build.sh
 
 - 分支 `main`，版本用附注 tag（`vX.Y.Z`），提交信息中文 `<模块>: <说明>`
 - 环境与工具链安装位置统一在 `D:\LGprogram\wince`（车机端交叉编译器、WSL 发行版均在此）
+
+## 许可证
+
+本仓库**全部原创代码**（车机端 `car/`、工具 `dexdump.js`、文档）以 [MIT License](LICENSE) 开源——任何人可自由使用、修改、分发、商用，仅需保留版权声明。
+
+说明：`dex_out.txt`、`*.apk.1.1` 等第三方产品的逆向分析材料仅作研究参考，其权利归原权利人所有，不属于 MIT 授权范围。
