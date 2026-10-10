@@ -88,6 +88,17 @@ $b=[IO.File]::ReadAllBytes("car\dist\EasyLink-v0.1.0.exe"); $pe=[BitConverter]::
 [BitConverter]::ToUInt16($b,$pe+92)   # subsystem: 9 = Windows CE
 ```
 
+## 5.5 测试（无需真机）
+
+```powershell
+# 宿主机功能测试：46 项断言（log/probe/install 真实源码 + Win32 桩）
+wsl -d Ubuntu -u root -- bash /mnt/d/LGramfiles/trae/car/test/run_test.sh
+# 静态检查：交叉编译器逐文件 -Wall -Wextra
+wsl -d Ubuntu -u root -- bash /mnt/d/LGramfiles/trae/car/test/test_syntax.sh
+```
+
+细节与坑见 `car/test/README.md`。改 `src/` 后必须两者全绿再提交。
+
 ## 6. 版本与提交约定
 
 - 提交信息：中文 `<模块>: <说明>`（例：`车机端: 修复触摸坐标越界`）
