@@ -282,6 +282,69 @@ static void test_install(void)
     log_close();
 }
 
+/* ================= 动态测试：main.c 全链路 =================
+ * 直接调用真实 WinMain（消息循环），预压"手指"消息序列：
+ *   点[深度探测] → 点[安装MAP启动] → 日志区触碰 → 双击标题退出
+ * 断言：日志落盘、安装产物、UI 绘制轨迹（标题/按钮/触摸坐标/日志区）
+ * ============================================================ */
+int WinMain(HINSTANCE inst, HINSTANCE prev, LPWSTR cmd, int show);
+#define M_DOWN(x,y) (WM_LBUTTONDOWN), 0, (long)((y)<<16 | (x))
+#define M_UP(x,y)   (WM_LBUTTONUP),   0, (long)((y)<<16 | (x))
+#define M_DBL(x,y)  (WM_LBUTTONDBLCLK), 0, (long)((y)<<16 | (x))
+
+static void test_ui(void)
+{
+    printf("[main.c 动态全链路]\n");
+
+    sb_reset();
+    write_file("SDMMC/EasyLink.exe", "FAKE-PE-CONTENT-v020");
+    set_self("SDMMC/EasyLink.exe");
+    winstub_reg_reset();
+    winstub_reg_add_key("Drivers");
+    winstub_reg_add_sz("Drivers", "Prefix", "EZUSB");
+    log_close();          /* 确保上一轮句柄已释放 */
+    log_clear();
+    winstub_ui_reset();
+
+    /* 按钮布局: bw=(800-16-24)/4=190, top=124..158
+     * btn0 深度探测 x∈[8,198]  btn1 安装MAP x∈[206,396] */
+    winstub_push_msg(M_DOWN(100,141));
+    winstub_push_msg(M_UP(100,141));
+    winstub_push_msg(M_DOWN(300,141));
+    winstub_push_msg(M_UP(300,141));
+    winstub_push_msg(M_DOWN(400,300));   /* 日志区空白触碰 */
+    winstub_push_msg(M_UP(400,300));
+    winstub_push_msg(M_DBL(400,10));     /* 双击标题退出 */
+
+    int rc = WinMain(NULL, NULL, NULL, 0);
+
+    const char* tr = winstub_ui_trace();
+    CHECK(rc == 0, "WinMain 走完消息循环正常返回 0");
+
+    /* UI 绘制轨迹（模拟屏幕渲染的全部文本） */
+    CHECK(strstr(tr, "EasyLink 车机端") != NULL, "标题栏已绘制");
+    CHECK(strstr(tr, "深度探测") != NULL && strstr(tr, "安装MAP启动") != NULL, "四个按钮标签已绘制");
+    CHECK(strstr(tr, "触摸: (400,300) 次数 3") != NULL, "底栏显示真实触摸坐标与次数");
+    CHECK(strstr(tr, "安装成功") != NULL, "日志区绘制出安装结果行");
+
+    /* 按钮动作的持久化副作用 */
+    {
+        long len; char* c = read_all("SDMMC/easylink_probe.log", &len);
+        CHECK(c != NULL, "日志文件已创建");
+        if (c) {
+            CHECK(strstr(c, "深度探测开始") != NULL, "点[深度探测]真实触发 probe_deep");
+            CHECK(strstr(c, "深度探测结束") != NULL, "probe_deep 执行到结束");
+            CHECK(strstr(c, "安装完成") != NULL, "点[安装MAP启动]真实触发 install");
+            CHECK(strstr(c, "双击标题，退出") != NULL, "双击标题退出路径已执行并落盘");
+        }
+    }
+    CHECK(file_exists("SDMMC/NaviOne/NaviOne.exe"), "点击后 MAP 键路径出现安装产物");
+    if (file_exists("SDMMC/NaviOne/NaviOne.exe")) {
+        long len; char* c = read_all("SDMMC/NaviOne/NaviOne.exe", &len);
+        CHECK(c && strcmp(c, "FAKE-PE-CONTENT-v020") == 0, "安装产物内容=运行中的自身");
+    }
+}
+
 int main(int argc, char** argv)
 {
     const char* sb = (argc > 1) ? argv[1] : "car_test_sandbox";
@@ -292,6 +355,7 @@ int main(int argc, char** argv)
     test_log();
     test_probe();
     test_install();
+    test_ui();
 
     printf("\n== 结果: PASS=%d FAIL=%d ==\n", g_pass, g_fail);
     return g_fail ? 1 : 0;

@@ -10,7 +10,7 @@ cp "$REPO"/src/*.c "$REPO"/src/*.h "$T"/
 cd "$T"
 # 源码在同目录：test_main.c 的 ../src 引用改为同目录
 sed -i 's#\.\./src/##g' test_main.c
-gcc -O1 -g -Wall -Wextra -I. -o eztest test_main.c winstub.c log.c probe.c install.c -D_GNU_SOURCE
+gcc -O1 -g -Wall -Wextra -I. -o eztest test_main.c winstub.c log.c probe.c install.c main.c -D_GNU_SOURCE
 echo "--- 编译通过"
 ./eztest /tmp/ezsandbox
 echo "TEST_EXIT=$?"

@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdarg.h>
 #include <time.h>
 #include <sys/stat.h>
 #include <errno.h>
@@ -266,3 +267,155 @@ LPWSTR lstrcpyW(LPWSTR d, LPCWSTR s) { return wcscpy(d, s); }
 LPWSTR lstrcatW(LPWSTR d, LPCWSTR s) { return wcscat(d, s); }
 int lstrlenW(LPCWSTR s) { return (int)wcslen(s); }
 int lstrcmpiW(LPCWSTR a, LPCWSTR b) { return wcscasecmp(a, b); }
+
+/* ============================================================
+ * 窗口/消息层（动态测试）：驱动 main.c 的 WinMain 全链路
+ * 测试预压输入消息 → WinMain 消息循环取出 → 窗口过程处理 →
+ * InvalidateRect 追加 WM_PAINT → 绘制文本全部记入 UI 轨迹
+ * ============================================================ */
+#define QMAX 256
+static MSG    g_queue[QMAX];
+static int    g_qh, g_qt;
+static int    g_quit = -1;           /* >=0 时 GetMessage 返回 0 */
+static WNDPROC g_wndproc;
+static HWND   g_hwnd;
+static int    g_dummyBrush;
+static char   g_trace[65536];
+static size_t g_tlen;
+
+void winstub_push_msg(UINT msg, WPARAM wp, LPARAM lp)
+{
+    if (g_qt < QMAX) {
+        g_queue[g_qt].hwnd = g_hwnd;
+        g_queue[g_qt].message = msg;
+        g_queue[g_qt].wParam = wp;
+        g_queue[g_qt].lParam = lp;
+        g_qt++;
+    }
+}
+void winstub_ui_reset(void)
+{
+    g_qh = g_qt = 0; g_quit = -1; g_tlen = 0; g_trace[0] = 0;
+    g_wndproc = NULL; g_hwnd = NULL;
+}
+const char* winstub_ui_trace(void) { return g_trace; }
+
+static void trace_wide(LPCWSTR w)
+{
+    while (*w && g_tlen < sizeof(g_trace) - 8) {
+        unsigned int c = (unsigned int)*w++;
+        if (c < 0x80) g_trace[g_tlen++] = (char)c;
+        else if (c < 0x800) {
+            g_trace[g_tlen++] = (char)(0xC0 | (c >> 6));
+            g_trace[g_tlen++] = (char)(0x80 | (c & 0x3F));
+        } else if (c < 0x10000) {
+            g_trace[g_tlen++] = (char)(0xE0 | (c >> 12));
+            g_trace[g_tlen++] = (char)(0x80 | ((c >> 6) & 0x3F));
+            g_trace[g_tlen++] = (char)(0x80 | (c & 0x3F));
+        } else {
+            g_trace[g_tlen++] = (char)(0xF0 | (c >> 18));
+            g_trace[g_tlen++] = (char)(0x80 | ((c >> 12) & 0x3F));
+            g_trace[g_tlen++] = (char)(0x80 | ((c >> 6) & 0x3F));
+            g_trace[g_tlen++] = (char)(0x80 | (c & 0x3F));
+        }
+    }
+    if (g_tlen < sizeof(g_trace) - 1) g_trace[g_tlen++] = '\n';
+    g_trace[g_tlen] = 0;
+}
+
+UINT RegisterClassW(const WNDCLASSW* wc)
+{
+    g_wndproc = wc->lpfnWndProc;
+    return 1;
+}
+HWND CreateWindowW(LPCWSTR cls, LPCWSTR title, DWORD style,
+                   int x, int y, int w, int h,
+                   HWND parent, HMENU menu, HINSTANCE inst, LPVOID param)
+{
+    (void)cls; (void)title; (void)style; (void)x; (void)y;
+    (void)w; (void)h; (void)parent; (void)menu; (void)inst; (void)param;
+    g_hwnd = (HWND)&g_dummyBrush;
+    if (g_wndproc) g_wndproc(g_hwnd, WM_CREATE, 0, 0);
+    return g_hwnd;
+}
+BOOL GetMessageW(MSG* m, HWND wnd, UINT minmsg, UINT maxmsg)
+{
+    (void)wnd; (void)minmsg; (void)maxmsg;
+    /* 队列优先（先画完挂起的 WM_PAINT），再判退出 —— 与真机
+     * WM_QUIT 特殊语义略异，但保证测试断言可观察到重绘 */
+    if (g_qh < g_qt) {
+        *m = g_queue[g_qh++];
+        m->hwnd = g_hwnd;   /* 压入时窗口尚未创建，出队时回填 */
+        return 1;
+    }
+    return 0;
+}
+BOOL TranslateMessage(const MSG* m) { (void)m; return 0; }
+LRESULT DispatchMessage(const MSG* m)
+{
+    return g_wndproc ? g_wndproc(m->hwnd, m->message, m->wParam, m->lParam) : 0;
+}
+void PostQuitMessage(int code) { g_quit = code; }
+BOOL DestroyWindow(HWND wnd)
+{
+    if (g_wndproc) g_wndproc(wnd, WM_DESTROY, 0, 0);
+    return TRUE;
+}
+BOOL InvalidateRect(HWND wnd, const RECT* r, BOOL erase)
+{
+    (void)r; (void)erase;
+    if (g_qt < QMAX) {
+        g_queue[g_qt].hwnd = wnd;
+        g_queue[g_qt].message = WM_PAINT;
+        g_queue[g_qt].wParam = 0;
+        g_queue[g_qt].lParam = 0;
+        g_qt++;
+    }
+    return TRUE;
+}
+BOOL GetClientRect(HWND wnd, RECT* r)
+{
+    (void)wnd;
+    r->left = 0; r->top = 0;
+    r->right = GetSystemMetrics(SM_CXSCREEN);
+    r->bottom = GetSystemMetrics(SM_CYSCREEN);
+    return TRUE;
+}
+HDC BeginPaint(HWND wnd, PAINTSTRUCT* ps)
+{
+    (void)wnd;
+    memset(ps, 0, sizeof(*ps));
+    ps->hdc = (HDC)&g_dummyBrush;
+    return ps->hdc;
+}
+BOOL EndPaint(HWND wnd, const PAINTSTRUCT* ps) { (void)wnd; (void)ps; return TRUE; }
+LRESULT DefWindowProcW(HWND wnd, UINT msg, WPARAM wp, LPARAM lp)
+{
+    (void)wnd; (void)msg; (void)wp; (void)lp;
+    return 0;
+}
+HBRUSH CreateSolidBrush(COLORREF c) { (void)c; return (HBRUSH)&g_dummyBrush; }
+BOOL DeleteObject(HGDIOBJ obj) { (void)obj; return TRUE; }
+int FillRect(HDC dc, const RECT* r, HBRUSH b) { (void)dc; (void)r; (void)b; return 1; }
+int DrawTextW(HDC dc, LPCWSTR text, int cch, RECT* r, UINT fmt)
+{
+    (void)dc; (void)cch; (void)r; (void)fmt;
+    if (text) trace_wide(text);
+    return 1;
+}
+int SetBkMode(HDC dc, int mode) { (void)dc; (void)mode; return 1; }
+COLORREF SetTextColor(HDC dc, COLORREF c) { (void)dc; return c; }
+HCURSOR LoadCursor(HINSTANCE inst, LPCWSTR name)
+{
+    (void)inst; (void)name;
+    return (HCURSOR)&g_dummyBrush;
+}
+int wsprintfW(wchar_t* buf, LPCWSTR fmt, ...)
+{
+    va_list ap;
+    int n;
+    va_start(ap, fmt);
+    n = vswprintf(buf, 256, fmt, ap);
+    va_end(ap);
+    return n;
+}

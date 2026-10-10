@@ -91,7 +91,7 @@ $b=[IO.File]::ReadAllBytes("car\dist\EasyLink-v0.1.0.exe"); $pe=[BitConverter]::
 ## 5.5 测试（无需真机）
 
 ```powershell
-# 宿主机功能测试：46 项断言（log/probe/install 真实源码 + Win32 桩）
+# 宿主机功能测试：58 项断言 = 模块 46 + main.c 动态全链路 12（WinMain 消息循环/触摸/重绘）
 wsl -d Ubuntu -u root -- bash /mnt/d/LGramfiles/trae/car/test/run_test.sh
 # 静态检查：交叉编译器逐文件 -Wall -Wextra
 wsl -d Ubuntu -u root -- bash /mnt/d/LGramfiles/trae/car/test/test_syntax.sh

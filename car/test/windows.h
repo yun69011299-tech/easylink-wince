@@ -114,4 +114,90 @@ LPWSTR lstrcatW(LPWSTR d, LPCWSTR s);
 int    lstrlenW(LPCWSTR s);
 int    lstrcmpiW(LPCWSTR a, LPCWSTR b);
 
+/* ============================================================
+ * 以下为窗口/消息层（动态测试用）：让 main.c 的 WinMain→消息循环→
+ * 窗口过程→触摸→WM_PAINT 全链路可在宿主机真实运行
+ * ============================================================ */
+#include <string.h>
+
+typedef void*    HWND;
+typedef void*    HDC;
+typedef void*    HBRUSH;
+typedef void*    HGDIOBJ;
+typedef void*    HCURSOR;
+typedef void*    HICON;
+typedef void*    HMENU;
+typedef intptr_t  LPARAM;
+typedef uintptr_t WPARAM;
+typedef intptr_t  LRESULT;
+typedef DWORD     COLORREF;
+
+typedef struct { int left, top, right, bottom; } RECT;
+typedef struct { HWND hwnd; UINT message; WPARAM wParam; LPARAM lParam; } MSG;
+typedef struct {
+    HDC hdc; BOOL fErase; RECT rcPaint;
+    BOOL fRestore; BOOL fIncUpdate; BYTE rgbReserved[128];
+} PAINTSTRUCT;
+typedef LRESULT (CALLBACK *WNDPROC)(HWND, UINT, WPARAM, LPARAM);
+typedef struct {
+    UINT style;
+    WNDPROC lpfnWndProc;
+    int cbClsExtra, cbWndExtra;
+    HINSTANCE hInstance;
+    HICON hIcon; HCURSOR hCursor;
+    LPCWSTR lpszMenuName, lpszClassName;
+} WNDCLASSW;
+
+#define WM_CREATE    0x0001
+#define WM_DESTROY   0x0002
+#define WM_PAINT     0x000F
+#define WM_LBUTTONDOWN  0x0201
+#define WM_LBUTTONUP    0x0202
+#define WM_LBUTTONDBLCLK 0x0203
+
+#define WS_POPUP     0x80000000ul
+#define WS_VISIBLE   0x10000000ul
+#define CS_DBLCLKS   0x0008
+#define IDC_ARROW    ((LPCWSTR)(long)32512)
+
+#define RGB(r,g,b) ((COLORREF)(((r)&0xff)|(((g)&0xff)<<8)|(((b)&0xff)<<16)))
+
+#define DT_LEFT       0x0000
+#define DT_TOP        0x0000
+#define DT_CENTER     0x0001
+#define DT_VCENTER    0x0004
+#define DT_SINGLELINE 0x0020
+#define DT_NOPREFIX   0x0400
+#define TRANSPARENT   1
+
+/* main.c 用 Win32 标准名取 lParam 低/高 16 位 */
+#define LOWORD(l) ((WORD)(((uintptr_t)(l)) & 0xffff))
+#define HIWORD(l) ((WORD)((((uintptr_t)(l)) >> 16) & 0xffff))
+
+typedef void* LPVOID;
+
+UINT    RegisterClassW(const WNDCLASSW* wc);
+HWND    CreateWindowW(LPCWSTR cls, LPCWSTR title, DWORD style,
+                      int x, int y, int w, int h,
+                      HWND parent, HMENU menu, HINSTANCE inst, LPVOID param);
+BOOL    GetMessageW(MSG* m, HWND wnd, UINT min, UINT max);
+BOOL    TranslateMessage(const MSG* m);
+LRESULT DispatchMessage(const MSG* m);
+#define DispatchMessageW DispatchMessage
+void    PostQuitMessage(int code);
+BOOL    DestroyWindow(HWND wnd);
+BOOL    InvalidateRect(HWND wnd, const RECT* r, BOOL erase);
+BOOL    GetClientRect(HWND wnd, RECT* r);
+HDC     BeginPaint(HWND wnd, PAINTSTRUCT* ps);
+BOOL    EndPaint(HWND wnd, const PAINTSTRUCT* ps);
+LRESULT DefWindowProcW(HWND wnd, UINT msg, WPARAM wp, LPARAM lp);
+HBRUSH  CreateSolidBrush(COLORREF c);
+BOOL    DeleteObject(HGDIOBJ obj);
+int     FillRect(HDC dc, const RECT* r, HBRUSH b);
+int     DrawTextW(HDC dc, LPCWSTR text, int cch, RECT* r, UINT fmt);
+int     SetBkMode(HDC dc, int mode);
+COLORREF SetTextColor(HDC dc, COLORREF c);
+HCURSOR LoadCursor(HINSTANCE inst, LPCWSTR name);
+int     wsprintfW(wchar_t* buf, LPCWSTR fmt, ...);
+
 #endif

@@ -10,16 +10,26 @@ wsl -d Ubuntu -u root -- bash /mnt/d/LGramfiles/trae/car/test/run_test.sh
 ```
 
 - 首次需宿主 gcc：`bash .../test/install_gcc.sh`（与交叉工具链无关）
-- 通过标准：`结果: PASS=46 FAIL=0` + `TEST_EXIT=0`
+- 通过标准：`结果: PASS=58 FAIL=0` + `TEST_EXIT=0`
 - 静态检查（交叉编译器 -Wall -Wextra）：`bash .../test/test_syntax.sh`
+
+## 两层测试
+
+1. **模块功能测试**（46 项）：log / probe / install 直接调用验证。
+2. **动态全链路测试**（12 项）：真实 `main.c` 的 `WinMain` → 消息循环 →
+   窗口过程 → WM_PAINT 全链路。测试预压"手指"消息序列
+   （点[深度探测] → 点[安装MAP启动] → 日志区触碰 → 双击标题退出），
+   断言按钮副作用真实落盘、UI 绘制轨迹（标题/按钮/触摸坐标/日志区）真实输出。
+   消息层桩提供队列 + FIFO 派发 + InvalidateRect 追加 WM_PAINT，
+   `DrawTextW` 输出全部记入 UI 轨迹供断言。
 
 ## 结构
 
 | 文件 | 职责 |
 |------|------|
-| `windows.h` | 精简 Win32 类型/常量声明（**DWORD=uint32_t，与 CE ABI 一致**） |
-| `winstub.c` | 文件 API → 沙箱目录映射；注册表 → 静态键值表 |
-| `test_main.c` | 46 项断言：log 路径选择/回落/环形缓冲/UTF-8、probe 版本与注册表枚举、install 备份覆盖/自路径判断 |
+| `windows.h` | 精简 Win32 类型/常量/窗口消息 API 声明（**DWORD=uint32_t，与 CE ABI 一致**） |
+| `winstub.c` | 文件 API → 沙箱目录映射；注册表 → 静态键值表；消息队列与 UI 轨迹 |
+| `test_main.c` | 58 项断言：模块 46 + 动态全链路 12 |
 | `run_test.sh` | 拷入 ext4、编译（sed 修正 `../src` 引用）、运行 |
 | `test_syntax.sh` | 交叉编译器逐文件 `-Wall -Wextra -fsyntax-only` |
 
