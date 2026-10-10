@@ -1,21 +1,43 @@
-MIT License
+EasyLink 非商业使用许可（EasyLink Non-Commercial License）
+版本 1.0
 
-Copyright (c) 2026 yun69011299-tech
+版权所有 (c) 2026 yun69011299-tech（下称"权利人"）
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+======================================================================
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+一、定义
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+1. "本项目"：指本仓库公开发布的全部内容，包括源代码、可执行文件、
+   文档、构建脚本及其衍生物（下称"软件"）。
+2. "非商业使用"：指个人学习、研究、教育、评估、测试以及非营利性质
+   的个人使用，且不以直接或间接获取经济利益为目的。
+3. "大规模商用"：指但不限于以下情形——
+   a) 将本软件预装、捆绑或集成到对外销售的硬件/车机/软件产品中；
+   b) 以本软件为核心向不特定对象提供收费服务；
+   c) 企业在生产环境中批量部署本软件（同一主体 10 台以上设备）；
+   d) 对本软件进行商业性再发行、销售或以其名义招揽业务。
+   小规模、内部试用性质的商业评估不属于上述情形，但如不确定，
+   应事先联系权利人确认。
+
+二、授权
+
+1. 权利人授予任何个人免费、非独占、不可再许可的许可，允许其出于
+   非商业使用目的使用、复制、修改本软件，但须：
+   a) 保留本文件及全部版权、许可声明；
+   b) 修改后的衍生作品继续以本许可发布。
+2. 共享本软件时，允许分发未修改的副本或仓库链接，同样须保留本文件。
+
+三、商业使用限制
+
+1. 未经权利人事先书面授权，任何人均不得出于商业目的或大规模商用
+   场景使用本软件。
+2. 商业授权请联系：通过本仓库 GitHub Issues 与权利人联系洽谈。
+
+四、免责声明
+
+本软件按"现状"提供，不附带任何明示或默示的担保，作者不对因使用
+本软件造成的任何损失承担责任。
+
+五、其他
+
+若本许可的中文表述与其他语言版本存在歧义，以中文版为准。
